@@ -26,8 +26,6 @@ Rails::Initializer.run do |config|
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "aws-s3", :lib => "aws/s3"
   #config.gem :searchgasm
-  config.plugin_paths += ["../../Ruby Libs"]
-  config.plugins = [:calendar_date_select, :searchgasm]
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

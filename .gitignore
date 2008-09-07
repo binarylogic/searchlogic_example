@@ -3,3 +3,4 @@ config/database.yml
 tmp/*
 log/*
 .DS_Store
+config/deploy.rb
