@@ -1,0 +1,36 @@
+<!--
+For information on the helpers used in here, glance at app/views/users. It is the same thing, but non-ajax
+-->
+<% remote_form_for @search do |f| %>
+    <fieldset>
+        <legend>Search Orders</legend>
+        
+        <% f.fields_for @search.conditions do |orders| %>
+            Total greater than:<br />
+            $<%= orders.text_field :total_greater_than %><br />
+            <br />
+            
+            Description keywords:<br />
+            <%= orders.text_field :description_keywords %><br />
+            <br />
+
+            <% orders.fields_for orders.object.user do |user| %>
+                Belongs to a user with a first name that starts with:<br />
+                <%= user.text_field :first_name_starts_with %><br />
+                <br />
+                
+                <% user.fields_for user.object.user_group do |user_group| %>
+                    Belongs to a user that belongs to a user group with a name that contains:<br />
+                    <%= user_group.text_field :name_contains %><br />
+                    <br />
+                <% end %>
+            <% end %>
+
+            <%= f.submit "Search" %>
+        <% end %>
+    </fieldset>
+<% end %>
+
+<div id="orders">
+    <%= render :partial => "orders" %>
+</div>

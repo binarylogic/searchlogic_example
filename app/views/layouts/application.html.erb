@@ -5,6 +5,23 @@
     <%= calendar_date_select_includes %>
 </head>
 <body>
+    <h1 style="font-size: 1.5em">Searchgasm example</h1>
+    This is a simple / plain example of how to implement Searchgasm into a rails application. As you can see it supports searching, ordering, and pagination all in one plugin. Here are some helpful links:<br />
+    <br />
+    <strong><a href="http://github.com/binarylogic/searchgasm_example">Source code for this example</a>&nbsp;&nbsp;|&nbsp;&nbsp;Tutorial on this example&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://github.com/binarylogic/searchgasm">Searchgasm source / repository</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://searchgasm.rubyforge.org">Searchgasm documentation</a></strong><br />
+    <br />
+    <% if controller_name == "users" %>
+        Non AJAX Example
+    <% else %>
+        <%= link_to "Non AJAX example", users_path %>
+    <% end %>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <% if controller_name == "orders" %>
+        AJAX Example
+    <% else %>
+        <%= link_to "AJAX example", orders_path %>
+    <% end %><br />
+    <br />
     <%= yield %>
 </body>
 </html>

@@ -1,0 +1,20 @@
+= Searchgasm Example
+
+This is an example of how to use Searchgasm in a rails app. Searchgasm is simple searching, ordering, and pagination all in one plugin.
+
+Checkout Searchgasm here: http://github.com/binarylogic/searchgasm
+Quick tutoiral on how to build this application here: http://github.com/binarylogic/searchgasm
+
+=== Key files
+
+Here are the files you want to glance at:
+
+1.	app/controllers/users_controller.rb
+2.	app/views/users
+3.	app/controllers/orders_controller.rb (same as users, but AJAX)
+4.	app/views/orders
+5.	config/initializers/searchgasm.rb
+
+
+
+Copyright (c) 2008 [Ben Johnson](http://github.com/binarylogic) of [Binary Logic](http://www.binarylogic.com), released under the MIT license

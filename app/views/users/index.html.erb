@@ -2,35 +2,50 @@
 You can pass your search object right into form_for or remote_form_for and it will do the rest. Just like passing an ActiveRecord attribute. Use it the same way:
 
 Need to scope the search? form_for([@current_user, @search])
+Need to namespace the search? form_for([:admin, @search])
 Want to specify your own url? form_for(@search, :url => whatever_path)
 Need to specify your own name? form_for(:whatever, @search)
 
-The beauty of this is that it recoginizes that its a search object and helps you out. It adds 3 hidden fields for you:
+The beauty of this is that it recognizes that its a search object and helps you out. It adds 3 hidden fields for you:
 
 1. order_by
 2. order_as
 2. per_page
 
-This way when people start a new search those 3 things will be "remembered" and the results will be displayed in that manner.
+This way when people start a new search those 3 things will be "remembered" and the results will be displayed in that manner. If you don't want to include these simply do:
+
+form_for(@search, :hidden_fields => [])
+
+or
+
+form_for(@search, :hidden_fields => :per_page) for only the per_page option
+
+or
+
+form_for(@search, :hidden_fields => [:order_by, :order_as]) for only the order_by and order_as options
+
+For more information please see Searchgasmm::Helpers::FormHelper
 -->
+
 <% form_for @search do |f| %>
     <fieldset>
-        <legend>Search</legend>
+        <legend>Search Users</legend>
         
         <% f.fields_for @search.conditions do |users| %>
             <!--
             You can specify ANY of the conditions available on ANY of the attributes. Adding a condition and having it be a part
             of the search is as simple as adding another form element.
             -->
-            First name:<br />
+            First name keywords:<br />
             <%= users.text_field :first_name_keywords %><br />
             <br />
             
+            <!-- This is a custom condition, checkout config/initializers/searchgasm.rb -->
             First name sounds like: (try &quot;bin&quot;, this is a custom condition, checkout config/initializers/searchgasm.rb)<br />
             <%= users.text_field :first_name_sounds_like %><br />
             <br />
             
-            Last name:<br />
+            Last name keywords:<br />
             <%= users.text_field :last_name_keywords %><br />
             <br />
             
@@ -56,6 +71,12 @@ This way when people start a new search those 3 things will be "remembered" and 
                 $<%= orders.text_field :total_gt %><br />
                 <br />
             <% end %>
+            
+            <% users.fields_for users.object.user_group do |user_group| %>
+                Belongs to user group with name that starts with:<br />
+                <%= user_group.text_field :name_starts_with %><br />
+                <br />
+            <% end %>
             <%= f.submit "Search" %>
         <% end %>
     </fieldset>
@@ -63,23 +84,42 @@ This way when people start a new search those 3 things will be "remembered" and 
 
 <% if @users_count > 0 %>
     <%= @users_count %> users found
-    <table>
+    <table border="1" cellpadding="5">
         <tr>
             <!--
-            order_by allows you to create a link to order the data by that coloumn. You aren't limited to the local columns. Since users belong to user groups we could do
+            order_by allows you to create a link to order the data by that coloumn. You aren't limited to the local columns. If users belonged to user groups we could do:
             
             order_by(:user_group => :name)
             
-            You can traverse through your relationships to define how things are ordered. There are a lot of options for this to allow you to customize it to your liking. Please
-            glance at the Searchgasm::Helpers module for a list of options.
+            If user groups belongs to accounts we could do:
+            
+            order_by(:user_group => {:account => :name})
+            
+            You can traverse through your relationships to define how things are ordered.
+            
+            All that order_by does is create a bunch of options and then spit it out as a link. If for some reason you don't want it to output a link you can pass it a block and do anything you want:
+            
+            <%= order_by(:id) { |options| link_to(options[:text], options[:url]) } %>
+            
+            or
+            
+            <% order_by(:id) do |options| %><%= link_to(options[:text], options[:url]) %><% end %>
+            
+            The options variable passes back the same options you are allowed to input, but with values.
+            
+            There are a lot of options for this to allow you to customize it to your liking. Please
+            glance at the Searchgasm::Helpers::SearchHelper module for a list of options.
             -->
             <th><%= order_by :id %></th>
-            <th><%= order_by :first_name %></th>
-            <th><%= order_by :last_name %></th>
-            <th><%= order_by :email %></th>
+            <th><%= order_by :user_group => :name %></th> <!-- order user_groups.name ASC -->
+            <th><% order_by(:first_name) do |options| %><%= link_to(options[:text], options[:url]) %><% end %></th>
+            <th><%= order_by(:last_name) { |options| link_to(options[:text], options[:url]) } %></th>
+            <th><%= order_by [:email, :first_name] %></th> <!-- order email ASC, first_name ASC -->
+        </tr>
         <% @users.each do |user| %>
             <tr>
                 <td><%= user.id %></td>
+                <td><%= user.user_group ? user.user_group.name : "-" %></td>
                 <td><%= user.first_name %></td>
                 <td><%= user.last_name %></td>
                 <td><%= user.email %></td>
@@ -90,12 +130,12 @@ This way when people start a new search those 3 things will be "remembered" and 
     <br />
     <br />
     <!--
-    Per page returns a select with the different options. This is very customizable, you can change just about anything. Please take a look at the Searchgasm::Helpers documentation for options
+    Per page returns a select with the different options. You can return links by passing :type => :links option, or just like order by, you can pass it a block and it will spit out the result of the block. This is very customizable, you can do anything you want with this. Please take a look at the Searchgasm::Helpers::SearchHelper documentation for options
     -->
     Per page: <%= per_page %>
 
     <!--
-    Page returns a drop down with the page options. You can change this from a drop down to a links. It's completely customizable. Please take a look at the Searchgasm::Helpers documentation for options
+    Page returns a drop down with the page options. You can return a flickr like navigation by passing :type => :links option, or just like order by, you can pass it a block and it will spit out the result of the block. It's completely customizable. Please take a look at the Searchgasm::Helpers::SearchHelper documentation for options
     -->
     <% if @search.page_count > 1 %>
         <br />
