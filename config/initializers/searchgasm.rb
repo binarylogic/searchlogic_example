@@ -1,3 +1,8 @@
+# Confugration
+Searchgasm::Config.configure do |config|
+  config.per_page = config.per_page_choices.first # 20
+end
+
 # Actual function for MySQL databases only
 class SoundsLikeCondition < Searchgasm::Condition::Base
   class << self
