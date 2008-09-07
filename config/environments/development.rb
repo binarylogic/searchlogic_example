@@ -17,4 +17,4 @@ config.action_controller.perform_caching             = false
 config.action_mailer.raise_delivery_errors = false
 
 config.plugin_paths += ["../../Ruby Libs"]
-config.plugins = ["calendar_date_select", "searchgasm-0.9.8"]
+config.plugins = ["calendar_date_select", "searchgasm-0.9.9"]
