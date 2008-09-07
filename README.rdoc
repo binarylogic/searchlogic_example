@@ -3,7 +3,7 @@
 This is an example of how to use Searchgasm in a rails app. Searchgasm is simple searching, ordering, and pagination all in one plugin.
 
 Checkout Searchgasm here: http://github.com/binarylogic/searchgasm
-Quick tutoiral on how to build this application here: http://github.com/binarylogic/searchgasm
+Quick tutoiral on how to build this application here: http://www.binarylogic.com/2008/9/7/tutorial-pagination-ordering-and-searching-with-searchgasm
 
 === Key files
 
