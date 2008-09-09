@@ -1,26 +1,27 @@
 <html>
 <head>
     <title>Searchgasm Example</title>
-    <%= javascript_include_tag :all %>
-    <%= calendar_date_select_includes %>
+    <% if controller.controller_path == "jquery/users" %>
+      <%= javascript_include_tag "jquery.min", "jquery.livequery", "jquery.form", "jquery_setup" %>
+    <% else %>
+      <%= javascript_include_tag "prototype" %>
+    <% end %>
 </head>
 <body>
     <h1 style="font-size: 1.5em">Searchgasm example</h1>
-    This is a simple / plain example of how to implement Searchgasm into a rails application. As you can see it supports searching, ordering, and pagination all in one plugin. Here are some helpful links:<br />
+    This is a simple / plain example of how to implement searching, ordering, and pagination using Searchgasm into a rails application. Here are some helpful links:<br />
     <br />
-    <strong><a href="http://github.com/binarylogic/searchgasm_example">Source code for this example</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://www.binarylogic.com/2008/9/7/tutorial-pagination-ordering-and-searching-with-searchgasm">Tutorial on this example</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://github.com/binarylogic/searchgasm">Searchgasm source / repository</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://searchgasm.rubyforge.org">Searchgasm documentation</a></strong><br />
+    <%= link_to "source code for this example", "http://github.com/binarylogic/searchgasm_example" %>&nbsp;&nbsp;|&nbsp;&nbsp;
+    <%= link_to "tutorial on this example", "http://www.binarylogic.com/2008/9/7/tutorial-pagination-ordering-and-searching-with-searchgasm" %>&nbsp;&nbsp;|&nbsp;&nbsp;
+    <%= link_to "searchgasm repository", "http://github.com/binarylogic/searchgasm" %>&nbsp;&nbsp;|&nbsp;&nbsp;
+    <%= link_to "searchgasm docs", "http://searchgasm.rubyforge.org" %>
     <br />
-    <% if controller_name == "users" %>
-        Non AJAX Example
-    <% else %>
-        <%= link_to "Non AJAX example", users_path %>
-    <% end %>
-    &nbsp;&nbsp;|&nbsp;&nbsp;
-    <% if controller_name == "orders" %>
-        AJAX Example
-    <% else %>
-        <%= link_to "AJAX example", orders_path %>
-    <% end %><br />
+    <br />
+    <strong>
+    <%= link_to "Non AJAX example", non_ajax_users_path %>&nbsp;&nbsp;|&nbsp;&nbsp;
+    <%= link_to "Rails AJAX helpers example", rails_ajax_users_path %>&nbsp;&nbsp;|&nbsp;&nbsp;
+    <%= link_to "Unobtrusive jQuery example", jquery_users_path %>
+    </strong>
     <br />
     <%= yield %>
 </body>

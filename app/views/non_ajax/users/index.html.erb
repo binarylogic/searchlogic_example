@@ -1,0 +1,74 @@
+<h2>Non AJAX</h2>
+Good ol' regular http requests.
+<br /><br />
+
+<% form_for [:non_ajax, @search] do |f| %>
+    <fieldset>
+        <legend>Search Users</legend>
+        
+        <% f.fields_for @search.conditions do |users| %>
+            First name keywords:<br />
+            <%= users.text_field :first_name_keywords %><br />
+            <br />
+            
+            First name sounds like: (try &quot;bin&quot;, this is a custom condition, checkout config/initializers/searchgasm.rb)<br />
+            <%= users.text_field :first_name_sounds_like %><br />
+            <br />
+            
+            Last name keywords:<br />
+            <%= users.text_field :last_name_keywords %><br />
+            <br />
+            
+            Email ends with:<br />
+            <%= users.text_field :email_ends_with %><br />
+            <br />
+
+            <% users.fields_for users.object.orders do |orders| %>
+                Has orders with a total greater than:<br />
+                $<%= orders.text_field :total_gt %><br />
+                <br />
+            <% end %>
+            
+            <% users.fields_for users.object.user_group do |user_group| %>
+                Belongs to user group with name that starts with:<br />
+                <%= user_group.text_field :name_starts_with %><br />
+                <br />
+            <% end %>
+            <%= f.submit "Search" %>
+        <% end %>
+    </fieldset>
+<% end %>
+
+<% if @users_count > 0 %>
+    <%= @users_count %> users found
+    <table border="1" cellpadding="5">
+        <tr>
+            <th><%= order_by_link :id %></th>
+            <th><%= order_by_link :user_group => :name %></th>
+            <th><%= order_by_link :first_name %></th>
+            <th><%= order_by_link :last_name %></th>
+            <th><%= order_by_link [:email, :first_name] %></th>
+        </tr>
+        <% @users.each do |user| %>
+            <tr>
+                <td><%= user.id %></td>
+                <td><%= user.user_group ? user.user_group.name : "-" %></td>
+                <td><%= user.first_name %></td>
+                <td><%= user.last_name %></td>
+                <td><%= user.email %></td>
+            </tr>
+        <% end %>
+    </table>
+    
+    <br />
+    <br />
+    
+    Per page: <%= per_page_select %>
+
+    <% if @search.page_count > 1 %>
+        <br />
+        Page: <%= page_select %>
+    <% end %>
+<% else %>
+    No users were returned
+<% end %>

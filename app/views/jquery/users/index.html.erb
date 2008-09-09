@@ -1,0 +1,44 @@
+<h2>Unobtrusive AJAX via jQuery</h2>
+This is the preferred method. Really nice, check out jquery_setup.js on how to switch everything over to AJAX.
+<br /><br />
+
+<% form_for [:jquery, @search], :html => {:id => "search_form"}, :js_lib => :jquery do |f| %>
+    <fieldset>
+        <legend>Search Users</legend>
+        
+        <% f.fields_for @search.conditions do |users| %>
+            First name keywords:<br />
+            <%= users.text_field :first_name_keywords %><br />
+            <br />
+            
+            First name sounds like: (try &quot;bin&quot;, this is a custom condition, checkout config/initializers/searchgasm.rb)<br />
+            <%= users.text_field :first_name_sounds_like %><br />
+            <br />
+            
+            Last name keywords:<br />
+            <%= users.text_field :last_name_keywords %><br />
+            <br />
+            
+            Email ends with:<br />
+            <%= users.text_field :email_ends_with %><br />
+            <br />
+
+            <% users.fields_for users.object.orders do |orders| %>
+                Has orders with a total greater than:<br />
+                $<%= orders.text_field :total_gt %><br />
+                <br />
+            <% end %>
+            
+            <% users.fields_for users.object.user_group do |user_group| %>
+                Belongs to user group with name that starts with:<br />
+                <%= user_group.text_field :name_starts_with %><br />
+                <br />
+            <% end %>
+            <%= f.submit "Search" %>
+        <% end %>
+    </fieldset>
+<% end %>
+
+<div id="users">
+  <%= render :partial => "users" %>
+</div>
