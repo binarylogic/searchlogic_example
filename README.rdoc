@@ -9,11 +9,8 @@ Quick tutoiral on how to build this application here: http://www.binarylogic.com
 
 Here are the files you want to glance at:
 
-1.	app/controllers/users_controller.rb
-2.	app/views/users
-3.	app/controllers/orders_controller.rb (same as users, but AJAX)
-4.	app/views/orders
-5.	config/initializers/searchgasm.rb
+1.	All of the controllers and their respective views
+2.	config/initializers/searchgasm.rb
 
 
 
