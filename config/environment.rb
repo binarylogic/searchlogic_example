@@ -44,11 +44,11 @@ Rails::Initializer.run do |config|
   # Run "rake -D time" for a list of tasks for finding time zone names. Uncomment to use default local time.
   config.time_zone = 'UTC'
   
-  if RAILS_ENV == "development" # putting this in environments/development.rb doesn't work, not sure why
-    config.plugin_paths = ["#{RAILS_ROOT}/../../Ruby Libs"]
-    config.plugins = [:searchgasm]
-    require "ruby-debug"
-  end
+  #if RAILS_ENV == "development" # putting this in environments/development.rb doesn't work, not sure why
+  #  config.plugin_paths = ["#{RAILS_ROOT}/../../Ruby Libs"]
+  #  config.plugins = [:searchgasm, :each_with_info]
+  #  require "ruby-debug"
+  #end
 
   # Your secret key for verifying cookie session data integrity.
   # If you change this key, all old sessions will become invalid!
