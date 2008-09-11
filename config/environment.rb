@@ -45,7 +45,7 @@ Rails::Initializer.run do |config|
   config.time_zone = 'UTC'
   
   if RAILS_ENV == "development" # putting this in environments/development.rb doesn't work, not sure why
-    config.plugin_paths += ["#{RAILS_ROOT}/../../Ruby Libs"]
+    config.plugin_paths = ["#{RAILS_ROOT}/../../Ruby Libs"]
     config.plugins = [:searchgasm]
   end
 
@@ -71,3 +71,5 @@ Rails::Initializer.run do |config|
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
 end
+
+require "ruby-debug"

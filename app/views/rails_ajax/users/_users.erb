@@ -28,10 +28,12 @@
     <br />
     
     Per page: <%= remote_per_page_select %>
-
+    <br />
+    <br />
     <% if @search.page_count > 1 %>
-        <br />
-        Page: <%= remote_page_select %>
+        <div class="pages">
+          <%= remote_page_links %>
+        </div>
     <% end %>
 <% else %>
     No users were returned

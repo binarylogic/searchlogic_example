@@ -64,10 +64,10 @@ Good ol' regular http requests.
     <br />
     
     Per page: <%= per_page_select %>
-
+    <br />
+    <br />
     <% if @search.page_count > 1 %>
-        <br />
-        Page: <%= page_select %>
+        <div class="pages"><%= page_links :spread => 1 %></div>
     <% end %>
 <% else %>
     No users were returned

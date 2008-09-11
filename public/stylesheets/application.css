@@ -1,0 +1,32 @@
+body {
+  font-family: Arial, Verdana, "Times New Roman", Times, serif;
+}
+
+div.pages {
+  font-weight: bold;
+}
+
+a.page, span.page {
+  padding: 4px 6px;
+}
+
+a.page {
+  margin: 0 3px;
+  border: 1px solid #ddd;
+  text-decoration: none;
+  color: #0063dc;
+}
+
+a.page:hover {
+  border: 1px solid #003366;
+  background-color: #0063dc;
+  color: #fff;
+}
+
+span.disabled_page {
+  color: #b1aab1;
+}
+
+span.current_page {
+  color: #ff0084;
+}
