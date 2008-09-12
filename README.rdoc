@@ -21,6 +21,7 @@ First you need to install the Populator and Faker gems. You can do this by eithe
 or by installing the gems manually
 
 <tt>sudo gem install populator</tt>
+
 <tt>sudo gem install faker</tt>
 
 After you have set up the gems and migrated your database you can generate the data:
