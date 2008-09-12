@@ -1,0 +1,24 @@
+login: &login
+  username: root
+  password: 
+
+development:
+  adapter: mysql
+  database: searchgasm_development 
+  encoding: utf8
+  socket: /tmp/mysql.sock
+  <<: *login
+
+test:
+  adapter: mysql
+  database: searchgasm_test
+  encoding: utf8
+  socket: /tmp/mysql.sock
+  <<: *login
+
+production:
+  adapter: mysql
+  database: searchgasm_production
+  encoding: utf8
+  socket: /tmp/mysql.sock
+  <<: *login
