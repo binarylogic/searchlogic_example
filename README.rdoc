@@ -12,6 +12,23 @@ Here are the files you want to glance at:
 1.	All of the controllers and their respective views
 2.	config/initializers/searchgasm.rb
 
+=== Generate Test Data
+
+First you need to install the Populator and Faker gems. You can do this by either using rails' gems task
+
+<tt>rake gems:install</tt>
+
+or by installing the gems manually
+
+<tt>sudo gem install populator</tt>
+
+<tt>sudo gem install faker</tt>
+
+After you have set up the gems and migrated your database you can generate the data:
+
+<tt>rake db:populate</tt>
+
+The populate task will create 8 user groups with 0 to 150 users each. Each user can have upto 7 orders. (see lib/tasks/populate.rb)
 
 
 Copyright (c) 2008 [Ben Johnson](http://github.com/binarylogic) of [Binary Logic](http://www.binarylogic.com), released under the MIT license
