@@ -25,7 +25,6 @@ Rails::Initializer.run do |config|
   # config.gem "bj"
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "aws-s3", :lib => "aws/s3"
-  #config.gem :searchgasm
   config.gem "populator", :version => ">=0.2.4"
   config.gem "faker",     :version => ">=0.3.1"
 
@@ -48,7 +47,7 @@ Rails::Initializer.run do |config|
   
   #if RAILS_ENV == "development" # putting this in environments/development.rb doesn't work, not sure why
   #  config.plugin_paths = ["#{RAILS_ROOT}/../../Ruby Libs"]
-  #  config.plugins = [:searchgasm, :each_with_info]
+  #  config.plugins = [:searchgasm]
   #  require "ruby-debug"
   #end
 

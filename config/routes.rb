@@ -7,9 +7,6 @@ ActionController::Routing::Routes.draw do |map|
   map.namespace :rails_ajax do |namespace|
     namespace.resources :users
   end
-  map.namespace :prototype do |namespace|
-    namespace.resources :users
-  end
   map.namespace :jquery do |namespace|
     namespace.resources :users
   end
