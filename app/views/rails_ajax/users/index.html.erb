@@ -9,10 +9,13 @@ If you are wanting to do unobtrusive javascript take a look at the jQuery exampl
         <legend>Search Users</legend>
         
         <% f.fields_for @search.conditions do |users| %>
+            Match ANY or ALL of the conditions:<br />
+            <%= users.select :any, [["All", false], ["Any", true]] %><br />
+            <br />
+            
             First name keywords:<br />
             <%= users.text_field :first_name_keywords %><br />
             <br />
-            
             First name sounds like: (try &quot;bin&quot;, this is a custom condition, checkout config/initializers/searchgasm.rb)<br />
             <%= users.text_field :first_name_sounds_like %><br />
             <br />
@@ -24,13 +27,11 @@ If you are wanting to do unobtrusive javascript take a look at the jQuery exampl
             Email ends with:<br />
             <%= users.text_field :email_ends_with %><br />
             <br />
-
             <% users.fields_for users.object.orders do |orders| %>
                 Has orders with a total greater than:<br />
                 $<%= orders.text_field :total_gt %><br />
                 <br />
             <% end %>
-            
             <% users.fields_for users.object.user_group do |user_group| %>
                 Belongs to user group with name that starts with:<br />
                 <%= user_group.text_field :name_starts_with %><br />

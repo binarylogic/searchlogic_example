@@ -739,9 +739,6 @@ module ActiveRecord
       #   If true, all the associated objects are readonly through the association.
       # [:validate]
       #   If false, don't validate the associated objects when saving the parent object. true by default.
-      # [:accessible]
-      #   Mass assignment is allowed for this assocation (similar to <tt>ActiveRecord::Base#attr_accessible</tt>).
-
       # Option examples:
       #   has_many :comments, :order => "posted_on"
       #   has_many :comments, :include => :author
@@ -855,8 +852,6 @@ module ActiveRecord
       #   If true, the associated object is readonly through the association.
       # [:validate]
       #   If false, don't validate the associated object when saving the parent object. +false+ by default.
-      # [:accessible]
-      #   Mass assignment is allowed for this assocation (similar to <tt>ActiveRecord::Base#attr_accessible</tt>).
       #
       # Option examples:
       #   has_one :credit_card, :dependent => :destroy  # destroys the associated credit card
@@ -973,8 +968,6 @@ module ActiveRecord
       #   If true, the associated object is readonly through the association.
       # [:validate]
       #   If false, don't validate the associated objects when saving the parent object. +false+ by default.
-      # [:accessible]
-      #   Mass assignment is allowed for this assocation (similar to <tt>ActiveRecord::Base#attr_accessible</tt>).
       #
       # Option examples:
       #   belongs_to :firm, :foreign_key => "client_of"
@@ -1190,8 +1183,6 @@ module ActiveRecord
       #   If true, all the associated objects are readonly through the association.
       # [:validate]
       #   If false, don't validate the associated objects when saving the parent object. +true+ by default.
-      # [:accessible<]
-      #   Mass assignment is allowed for this assocation (similar to <tt>ActiveRecord::Base#attr_accessible</tt>).
       #
       # Option examples:
       #   has_and_belongs_to_many :projects
@@ -1246,7 +1237,7 @@ module ActiveRecord
 
             association = instance_variable_get(ivar) if instance_variable_defined?(ivar)
 
-            if association.nil? || force_reload
+            if association.nil? || !association.loaded? || force_reload
               association = association_proxy_class.new(self, reflection)
               retval = association.reload
               if retval.nil? and association_proxy_class == BelongsToAssociation
@@ -1266,14 +1257,19 @@ module ActiveRecord
               association = association_proxy_class.new(self, reflection)
             end
 
-            new_value = reflection.klass.new(new_value) if reflection.options[:accessible] && new_value.is_a?(Hash)
-
             if association_proxy_class == HasOneThroughAssociation
               association.create_through_record(new_value)
               self.send(reflection.name, new_value)
             else
               association.replace(new_value)
               instance_variable_set(ivar, new_value.nil? ? nil : association)
+            end
+          end
+
+          if association_proxy_class == BelongsToAssociation
+            define_method("#{reflection.primary_key_name}=") do |target_id|
+              instance_variable_get(ivar).reset if instance_variable_defined?(ivar)
+              write_attribute(reflection.primary_key_name, target_id)
             end
           end
 
@@ -1509,29 +1505,35 @@ module ActiveRecord
           end
         end
 
-        def create_has_many_reflection(association_id, options, &extension)
-          options.assert_valid_keys(
-            :class_name, :table_name, :foreign_key, :primary_key,
-            :dependent,
-            :select, :conditions, :include, :order, :group, :limit, :offset,
-            :as, :through, :source, :source_type,
-            :uniq,
-            :finder_sql, :counter_sql,
-            :before_add, :after_add, :before_remove, :after_remove,
-            :extend, :readonly,
-            :validate, :accessible
-          )
+        mattr_accessor :valid_keys_for_has_many_association
+        @@valid_keys_for_has_many_association = [
+          :class_name, :table_name, :foreign_key, :primary_key,
+          :dependent,
+          :select, :conditions, :include, :order, :group, :limit, :offset,
+          :as, :through, :source, :source_type,
+          :uniq,
+          :finder_sql, :counter_sql,
+          :before_add, :after_add, :before_remove, :after_remove,
+          :extend, :readonly,
+          :validate
+        ]
 
+        def create_has_many_reflection(association_id, options, &extension)
+          options.assert_valid_keys(valid_keys_for_has_many_association)
           options[:extend] = create_extension_modules(association_id, extension, options[:extend])
 
           create_reflection(:has_many, association_id, options, self)
         end
 
-        def create_has_one_reflection(association_id, options)
-          options.assert_valid_keys(
-            :class_name, :foreign_key, :remote, :select, :conditions, :order, :include, :dependent, :counter_cache, :extend, :as, :readonly, :validate, :primary_key, :accessible
-          )
+        mattr_accessor :valid_keys_for_has_one_association
+        @@valid_keys_for_has_one_association = [
+          :class_name, :foreign_key, :remote, :select, :conditions, :order,
+          :include, :dependent, :counter_cache, :extend, :as, :readonly,
+          :validate, :primary_key
+        ]
 
+        def create_has_one_reflection(association_id, options)
+          options.assert_valid_keys(valid_keys_for_has_one_association)
           create_reflection(:has_one, association_id, options, self)
         end
 
@@ -1542,12 +1544,15 @@ module ActiveRecord
           create_reflection(:has_one, association_id, options, self)
         end
 
-        def create_belongs_to_reflection(association_id, options)
-          options.assert_valid_keys(
-            :class_name, :foreign_key, :foreign_type, :remote, :select, :conditions, :include, :dependent,
-            :counter_cache, :extend, :polymorphic, :readonly, :validate, :accessible
-          )
+        mattr_accessor :valid_keys_for_belongs_to_association
+        @@valid_keys_for_belongs_to_association = [
+          :class_name, :foreign_key, :foreign_type, :remote, :select, :conditions,
+          :include, :dependent, :counter_cache, :extend, :polymorphic, :readonly,
+          :validate
+        ]
 
+        def create_belongs_to_reflection(association_id, options)
+          options.assert_valid_keys(valid_keys_for_belongs_to_association)
           reflection = create_reflection(:belongs_to, association_id, options, self)
 
           if options[:polymorphic]
@@ -1565,7 +1570,7 @@ module ActiveRecord
             :finder_sql, :delete_sql, :insert_sql,
             :before_add, :after_add, :before_remove, :after_remove,
             :extend, :readonly,
-            :validate, :accessible
+            :validate
           )
 
           options[:extend] = create_extension_modules(association_id, extension, options[:extend])

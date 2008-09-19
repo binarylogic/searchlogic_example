@@ -7,6 +7,10 @@ Good ol' regular http requests.
         <legend>Search Users</legend>
         
         <% f.fields_for @search.conditions do |users| %>
+            Match ANY or ALL of the conditions:<br />
+            <%= users.select :any, [["All", false], ["Any", true]] %><br />
+            <br />
+            
             First name keywords:<br />
             <%= users.text_field :first_name_keywords %><br />
             <br />
