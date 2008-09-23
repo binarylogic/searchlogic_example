@@ -1,6 +1,6 @@
 # Confugration
 Searchgasm::Config.configure do |config|
-  config.per_page = config.per_page_choices.first # 20
+  config.per_page = config.per_page_choices.first # 10
 end
 
 # Actual function for MySQL databases only

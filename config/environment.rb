@@ -46,7 +46,7 @@ Rails::Initializer.run do |config|
   config.time_zone = 'UTC'
   
   #if RAILS_ENV == "development" # putting this in environments/development.rb doesn't work, not sure why
-  #  config.plugin_paths = ["#{RAILS_ROOT}/../../Ruby Libs"]
+  #  config.plugin_paths = ["#{RAILS_ROOT}/../../Libs"]
   #  config.plugins = [:searchgasm]
   #  require "ruby-debug"
   #end
