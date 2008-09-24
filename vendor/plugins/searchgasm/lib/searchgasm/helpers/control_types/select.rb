@@ -13,7 +13,7 @@ module Searchgasm
         
         # Please see order_as_links. All options are the same and applicable here. The only difference is that instead of a group of links, this gets returned as a select form element that will perform the same function when the value is changed.
         def order_as_select(options = {})
-          add_order_by_select_defaults!(options)
+          add_order_as_select_defaults!(options)
           searchgasm_state_for(:order_as, options) + select(options[:params_scope], :order_as, options[:choices], options[:tag], options[:html])
         end
         
@@ -59,19 +59,14 @@ module Searchgasm
             options[:tag] ||= {}
             options[:tag][:object] = options[:search_obj]
             
-            url = searchgasm_url_hash(option, nil, options)
-            url.delete(option)
-            url = searchgasm_url(url, options)
-            url = url_for(url)
-            url_option = CGI.escape((options[:params_scope].blank? ? "#{option}" : "#{options[:params_scope]}[#{option}]")) + "='+this.value"
-            url += (url.last == "?" ? "" : (url.include?("?") ? "&amp;" : "?")) + url_option
+            url = searchgasm_url(options.merge(:literal_search_params => {option => "'+this.value+'"}))
             
             options[:html][:onchange] ||= ""
             options[:html][:onchange] += ";"
             if !options[:remote]
-              options[:html][:onchange] += "window.location='#{url};"
+              options[:html][:onchange] += "window.location='#{url}';"
             else
-              options[:html][:onchange] += remote_function(:url => url, :method => :get).gsub(/\\'\+this.value'/, "'+this.value")
+              options[:html][:onchange] += remote_function(:url => url, :method => :get).gsub(/\\'\+this.value\+\\'/, "'+this.value+'")
             end
             options[:html][:id] ||= ""
             options
