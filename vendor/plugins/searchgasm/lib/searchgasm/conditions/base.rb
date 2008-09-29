@@ -68,8 +68,11 @@ module Searchgasm
           
           if conditions.is_a?(Hash)
             return true if conditions[:any]
+            stringified_conditions = conditions.stringify_keys
+            stringified_conditions.keys.each { |condition| return false if condition.include?(".") } # setting conditions on associations, which is just another way of writing SQL, and we ignore SQL
+            
             column_names = model_class.column_names
-            conditions.stringify_keys.keys.each do |condition|
+            stringified_conditions.keys.each do |condition|
               return true unless column_names.include?(condition)
             end
           end
@@ -132,7 +135,7 @@ module Searchgasm
         when Hash          
           assert_valid_conditions(value)
           remove_conditions_from_protected_assignement(value).each do |condition, condition_value|
-            next if condition_value.blank? # ignore blanks on mass assignments
+            next if meaningless?(condition_value) # ignore blanks on mass assignments
             send("#{condition}=", condition_value)
           end
         else
@@ -216,7 +219,7 @@ module Searchgasm
             def #{name}; #{name}_object.value; end
             
             def #{name}=(value)
-              if value.blank? && #{name}_object.class.ignore_blanks?
+              if meaningless?(value) && #{name}_object.class.ignore_meaningless?
                 reset_#{name}!
               else
                 @conditions = nil

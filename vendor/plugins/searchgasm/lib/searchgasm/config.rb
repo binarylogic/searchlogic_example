@@ -44,7 +44,7 @@ module Searchgasm
       end
       
       def hidden_fields # :nodoc:
-        @hidden_fields ||= (Search::Base::SPECIAL_FIND_OPTIONS - [:page])
+        @hidden_fields ||= (Search::Base::SPECIAL_FIND_OPTIONS - [:page, :priority_order])
       end
       
       # Which hidden fields to automatically include when creating a form with a Searchgasm object. See Searchgasm::Helpers::Form for more info.
@@ -135,7 +135,7 @@ module Searchgasm
       # The reason for this not to disturb regular queries such as Whatever.find(:all). You would not expect that to be limited.
       #
       # * <tt>Default:</tt> The 3rd option in your per_page_choices, default of 50
-      # * <tt>Accepts:</tt> Any value in your per_page choices, nil means "show all"
+      # * <tt>Accepts:</tt> Any value in your per_page choices, nil or a blank string means "show all"
       def per_page=(value)
         @per_page = value
       end
@@ -152,6 +152,28 @@ module Searchgasm
       # nil means "Show all"
       def per_page_choices=(value)
         @per_page_choices = value
+      end
+      
+      def remove_duplicates # :nodoc:
+        return @remove_duplicates if @set_remove_duplicates
+        @remove_duplicates ||= ::ActiveRecord::VERSION::MAJOR < 2 || (::ActiveRecord::VERSION::MAJOR == 2 && ::ActiveRecord::VERSION::MINOR < 2)
+      end
+      
+      def remove_duplicates? # :nodoc:
+        remove_duplicates == true
+      end
+      
+      # If you are using ActiveRecord < 2.2.0 then ActiveRecord does not remove duplicates when using the :joins option, when it should. To fix this problem searchgasm does this for you. Searchgasm tries to act
+      # just like ActiveRecord, but in this instance it doesn't make sense.
+      #
+      # As a result, Searchgasm removes all duplicates results in *ALL* search / calculation queries. It does this by forcing the DISTINCT or GROUP BY operation in your SQL. Which might come as a surprise to you
+      # since it is not the "norm". If you don't want searchgasm to do this, set this to false.
+      #
+      # * <tt>Default:</tt> true
+      # * <tt>Accepts:</tt> Boolean
+      def remove_duplicates=(value)
+        @set_remove_duplicates = true
+        @remove_duplicates = value
       end
     end
   end

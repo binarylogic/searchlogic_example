@@ -16,7 +16,7 @@ module Searchgasm #:nodoc:
       AR_OPTIONS = (AR_FIND_OPTIONS + AR_CALCULATIONS_OPTIONS).uniq
       
       # Options that ActiveRecord doesn't suppport, but Searchgasm does
-      SPECIAL_FIND_OPTIONS = [:order_by, :order_as, :page, :per_page]
+      SPECIAL_FIND_OPTIONS = [:order_by, :order_as, :page, :per_page, :priority_order, :priority_order_by, :priority_order_as]
       
       # Valid options you can use when searching
       OPTIONS = SPECIAL_FIND_OPTIONS + AR_OPTIONS # the order is very important, these options get set in this order
@@ -100,13 +100,7 @@ module Searchgasm #:nodoc:
       def options=(values)
         return unless values.is_a?(Hash)
         values.symbolize_keys.fast_assert_valid_keys(OPTIONS)
-        
-        OPTIONS.each do |option|
-          next unless values.has_key?(option)
-          send("#{option}=", values[option])
-        end
-        
-        values
+        values.each { |key, value| send("#{key}=", value) }
       end
       
       # Sanitizes everything down into options ActiveRecord::Base.find can understand
@@ -118,16 +112,18 @@ module Searchgasm #:nodoc:
           next if value.blank?
           find_options[find_option] = value
         end
-
-        unless find_options[:joins].blank?
-          # The following is to return uniq records since we are using joins instead of includes
-          if searching
-            find_options[:group] ||= "#{quote_table_name(klass.table_name)}.#{quote_column_name(klass.primary_key)}"
-          else
-            find_options[:distinct] = true
+        
+        if Config.remove_duplicates?
+          unless find_options[:joins].blank?
+            # The following is to return uniq records since we are using joins instead of includes
+            if searching
+              find_options[:group] ||= "#{quote_table_name(klass.table_name)}.#{quote_column_name(klass.primary_key)}"
+            else
+              find_options[:distinct] = true
+            end
           end
         end
-
+        
         find_options
       end
       
