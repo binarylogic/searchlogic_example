@@ -4,28 +4,22 @@ Searchgasm::Config.configure do |config|
 end
 
 # Actual function for MySQL databases only
-class SoundsLikeCondition < Searchgasm::Condition::Base
+class SoundsLike < Searchgasm::Condition::Base
   class << self
-    # I pass you the column, you tell me what you want the method to be called.
-    # If you don't want to add this condition for that column, return nil
-    # It defaults to "#{column.name}_sounds_like". So if thats what you want you don't even need to do this.
-    def name_for_column(column)
-      return unless column.type == :string
-      super
-    end
-
-    # Only do this if you want aliases for your condition
-    def aliases_for_column(column)
-      ["#{column.name}_sounds", "#{column.name}_similar_to"]
+    # The name of the conditions. By default its the name of the class, if you want alternate or alias conditions just add them on.
+    # If you don't want to add aliases you don't even need to define this method
+    def name_for_columsn(column)
+      super + ["sounds", "similar_to"]
     end
   end
 
   # You can return an array or a string. NOT a hash, because all of these conditions
   # need to eventually get merged together. The array or string can be anything you would put in
-  # the :conditions option for ActiveRecord::Base.find()
+  # the :conditions option for ActiveRecord::Base.find(). Also notice the column_sql variable. This is essentail
+  # for applying modifiers and should be used in your conditions wherever you want the column.
   def to_conditions(value)
-    ["#{quoted_table_name}.#{quoted_column_name} SOUNDS LIKE ?", value]
+    ["#{column_sql} SOUNDS LIKE ?", value]
   end
 end
 
-Searchgasm::Conditions::Base.register_condition(SoundsLikeCondition)
+Searchgasm::Conditions::Base.register_condition(SoundsLike)
