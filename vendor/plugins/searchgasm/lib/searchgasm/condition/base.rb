@@ -44,8 +44,8 @@ module Searchgasm
 
         if column_obj
           self.column = column_obj.class < ::ActiveRecord::ConnectionAdapters::Column ? column_obj : klass.columns_hash[column_obj.to_s]
-          column_type ||= column.type
-          self.column_for_type_cast = column.class.new(column.name, column.default.to_s, self.class.value_type.to_s || column_type.to_s, column.null)
+          type = (!self.class.value_type.blank? && self.class.value_type.to_s) || (!column_type.blank? && column_type.to_s) || column.sql_type
+          self.column_for_type_cast = column.class.new(column.name, column.default.to_s, type, column.null)
           self.column_sql = column_sql || "#{klass.connection.quote_table_name(klass.table_name)}.#{klass.connection.quote_column_name(column.name)}"
         end
       end
@@ -60,13 +60,9 @@ module Searchgasm
         @explicitly_set_value == true
       end
       
-      def meaningless_value?
-        !explicitly_set_value? || (self.class.ignore_meaningless_value? && meaningless?(@value))
-      end
-      
       # You should refrain from overwriting this method, it performs various tasks before callign your to_conditions method, allowing you to keep to_conditions simple.
       def sanitize(alt_value = nil) # :nodoc:
-        return if meaningless_value?
+        return if value_is_meaningless?
         v = alt_value || value
         if v.is_a?(Array) && !self.class.handle_array_value?
           merge_conditions(*v.collect { |i| sanitize(i) })
@@ -78,13 +74,7 @@ module Searchgasm
       
       # The value for the condition
       def value
-        return @casted_value if @casted_value
-        
-        if !column_for_type_cast || meaningless_value?
-          @casted_value = @value
-        else
-          @casted_value = @value.is_a?(String) ? column_for_type_cast.type_cast(@value) : @value
-        end
+        @casted_value ||= type_cast_value(@value)
       end
     
       # Sets the value for the condition
@@ -94,10 +84,19 @@ module Searchgasm
         @value = v
       end
       
+      def value_is_meaningless? # :nodoc:
+        meaningless?(@value)
+      end
+      
       private
         def meaningless?(v)
-          return false if v == false
-          v.blank?
+          case v
+          when Array
+            v.each { |i| return false unless meaningless?(i) }
+            true
+          else
+            !explicitly_set_value? || (self.class.ignore_meaningless_value? && v != false && v.blank?)
+          end
         end
 
         def meaningful?(v)
@@ -114,6 +113,17 @@ module Searchgasm
         
         def quoted_table_name
           quote_table_name(klass.table_name)
+        end
+        
+        def type_cast_value(v)
+          case v
+          when Array
+            v.collect { |i| type_cast_value(i) }.compact
+          else
+            return if meaningless?(v)
+            return v if !column_for_type_cast || !v.is_a?(String)
+            column_for_type_cast.type_cast(v)
+          end
         end
     end
   end

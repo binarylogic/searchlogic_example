@@ -199,7 +199,21 @@ module Searchgasm
         when Hash
           assert_valid_conditions(value)
           remove_conditions_from_protected_assignement(value).each do |condition, condition_value|
-            send("#{condition}=", condition_value)
+            
+            # delete all blanks from mass assignments, forms submit blanks, blanks are meaningless
+            # equals condition thinks everything is meaningful, and arrays can be pased
+            new_condition_value = nil
+            case condition_value
+            when Array
+              new_condition_value = []
+              condition_value.each { |v| new_condition_value << v unless v == "" }
+              next if new_condition_value.size == 0
+            else
+              next if condition_value == ""
+              new_condition_value = condition_value
+            end
+            
+            send("#{condition}=", new_condition_value)
           end
         else
           reset_objects!
@@ -219,7 +233,7 @@ module Searchgasm
             next if relationship_conditions.blank?
             conditions_hash[object.relationship_name.to_sym] = relationship_conditions
           else
-            next if object.meaningless_value?
+            next if object.value_is_meaningless?
             conditions_hash[name] = object.value
           end
         end
@@ -374,7 +388,7 @@ module Searchgasm
               @conditions = nil
               
               #{name}_object.value = value
-              reset_#{name}! if #{name}_object.meaningless_value?
+              reset_#{name}! if #{name}_object.value_is_meaningless?
               value
             end
             
@@ -395,7 +409,20 @@ module Searchgasm
         
         def assert_valid_conditions(conditions)
           conditions.each do |condition, value|
-            raise(ArgumentError, "The #{condition} condition is not a valid condition") if !(self.class.condition_names + self.class.association_names + ["any"]).include?(condition.to_s) && respond_to?(condition)
+            next if (self.class.condition_names + self.class.association_names + ["any"]).include?(condition.to_s)
+            
+            go_to_next = false
+            self.class.column_details.each do |column_detail|
+              if column_detail[:column].name == condition.to_s || column_detail[:aliases].include?(condition.to_s)
+                go_to_next = true
+                break
+              end
+            end
+            next if go_to_next
+            
+            next unless respond_to?(condition)
+            
+            raise(ArgumentError, "The #{condition} condition is not a valid condition")
           end
         end
         
