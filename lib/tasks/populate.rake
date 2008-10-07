@@ -12,7 +12,7 @@ namespace :db do
       user_group.name   = Populator.words(1..2).titleize
       user_group.active = [true, false]
       User.populate 0..150 do |user|
-        user.user_group_id  = user_group.id 
+        user.user_group_id  = [nil, user_group.id]
         user.first_name     = Faker::Name.first_name
         user.last_name      = Faker::Name.last_name
         user.email          = "#{user.first_name.downcase}.#{user.last_name.downcase}@#{Faker::Internet.domain_name}"

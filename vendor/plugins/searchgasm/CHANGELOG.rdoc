@@ -1,13 +1,27 @@
-== 1.3.2 released 2008-10-02
+== 1.3.4 released 2008-10-03
+
+* Fixed method names creation for conditions with modifiers
+* Create local column conditions, incase there are method conflicts. Such as "id".
+* All joins are switched to left outer joins. When search with *any* conditions, inner joins return incorrect results. Also when ordering by an association that allows for blanks, inner joins exclude the records with blank values. Only option is left outer joins.
+* If joins is manually set with a string, treat it as SQL, just like ActiveRecord
+
+== 1.3.3 released 2008-10-03
+
+* Fixed modifiers being double escaped on equals condition
+* Fixed bug when merging conditions with array substitutions
+* Updated blank condition to check if the values is false or not
+* Fixed type for the year modifier in the mysql adapter
+
+== 1.3.2 released 2008-10-03
 
 * Fixed condition to type cast all values in an array
 * Fixed bug to properly set the type for the type cast column
 * Fixed bug to allow conditions on local columns
 * Apparently ActiveRecord 2.2 doesnt remove duplicates on all joins, need to enforce this for ALL versions of ActiveRecord
 * Fixed bug when passing a symbol as the SQL type for condition return types
-* Moved duplicate removal to only apply when searching or calculating from a search object. Anything done in a normal ActiveRecord method should remain untouched and let ActiveRecord handle it. Just like in ActiveRecord if you do a User.all search and pass some :joins, you might get duplicate records.
-* Discard meaningless array values
-* Delete blank strings from mass assignments on conditions
+* Moved duplicate removal to only apply when searching or calculating from a search object. Anything done in a normal ActiveRecord method should remain untouched and let ActiveRecord handle it. Just like in ActiveRecord if you do a User.all search and pass some :joins, you might get duplicate records. Searchgasm should not change that behavior, unless called from a searchgasm object.
+* Discard meaningless array values when setting a condition.
+* Delete blank strings from mass assignments on conditions.
 
 == 1.3.1 released 2008-10-02
 
