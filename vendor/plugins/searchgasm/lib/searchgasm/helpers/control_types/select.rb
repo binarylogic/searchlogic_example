@@ -32,25 +32,28 @@ module Searchgasm
         private
           def add_order_by_select_defaults!(options)
             add_order_by_links_defaults!(options)
+            searchgasm_add_class!(options[:html], Config.helpers.order_by_select_class_name)
             add_searchgasm_select_defaults!(:order_by, options)
             options
           end
           
           def add_order_as_select_defaults!(options)
             add_order_as_links_defaults!(options)
+            searchgasm_add_class!(options[:html], Config.helpers.order_as_select_class_name)
             add_searchgasm_select_defaults!(:order_as, options)
             options
           end
           
           def add_per_page_select_defaults!(options)
             add_per_page_links_defaults!(options)
-            options[:choices] = options[:choices].collect { |choice| choice.nil? ? ["Show all", choice] : ["#{choice} per page", choice]}
+            searchgasm_add_class!(options[:html], Config.helpers.per_page_select_class_name)
             add_searchgasm_select_defaults!(:per_page, options)
             options
           end
           
           def add_page_select_defaults!(options)
             add_page_links_defaults!(options)
+            searchgasm_add_class!(options[:html], Config.helpers.page_select_class_name)
             add_searchgasm_select_defaults!(:page, options)
             options
           end
@@ -68,7 +71,7 @@ module Searchgasm
             else
               options[:html][:onchange] += remote_function(:url => url, :method => :get).gsub(/\\'\+this.value\+\\'/, "'+this.value+'")
             end
-            options[:html][:id] ||= ""
+            options[:html][:id] ||= "#{option}_select"
             options
           end
       end

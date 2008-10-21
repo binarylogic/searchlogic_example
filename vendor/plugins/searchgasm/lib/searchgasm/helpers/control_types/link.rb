@@ -78,10 +78,10 @@ module Searchgasm
         # * <tt>:html</tt> -- html arrtributes for the <a> tag.
         #
         # === Advanced Options
-        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base leve in params such as params[:page], params[:per_page], etc, then set this to nil.
+        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base level in params such as params[:page], params[:per_page], etc, then set this to nil.
         # * <tt>:search_obj</tt> -- default: @#{params_scope}, this is your search object, everything revolves around this. It will try to infer the name from your params_scope. If your params_scope is :search it will try to get @search, etc. If it can not be inferred by this, you need to pass the object itself.
         # * <tt>:params</tt> -- default: nil, Additional params to add to the url, must be a hash
-        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get include. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
+        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get included. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
         # * <tt>:search_params</tt> -- default: nil, Additional search params to add to the url, must be a hash. Adds the options into the :params_scope.
         # * <tt>:exclude_search_params</tt> -- default: nil, Same as :exclude_params but for the :search_params.
         def order_by_link(order_by, options = {})
@@ -97,7 +97,7 @@ module Searchgasm
           html
         end
         
-        # Creates a link for ascending or descending data, pretty self e
+        # Creates a link for ascending or descending data.
         #
         # === Example uses
         #
@@ -110,10 +110,10 @@ module Searchgasm
         # * <tt>:html</tt> -- html arrtributes for the <a> tag.
         #
         # === Advanced Options
-        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base leve in params such as params[:page], params[:per_page], etc, then set this to nil.
+        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base level in params such as params[:page], params[:per_page], etc, then set this to nil.
         # * <tt>:search_obj</tt> -- default: @#{params_scope}, this is your search object, everything revolves around this. It will try to infer the name from your params_scope. If your params_scope is :search it will try to get @search, etc. If it can not be inferred by this, you need to pass the object itself.
         # * <tt>:params</tt> -- default: nil, Additional params to add to the url, must be a hash
-        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get include. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
+        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get included. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
         # * <tt>:search_params</tt> -- default: nil, Additional search params to add to the url, must be a hash. Adds the options into the :params_scope.
         # * <tt>:exclude_search_params</tt> -- default: nil, Same as :exclude_params but for the :search_params.
         def order_as_link(order_as, options = {})
@@ -151,10 +151,10 @@ module Searchgasm
         # * <tt>:html</tt> -- html arrtributes for the <a> tag.
         #
         # === Advanced Options
-        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base leve in params such as params[:page], params[:per_page], etc, then set this to nil.
+        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base level in params such as params[:page], params[:per_page], etc, then set this to nil.
         # * <tt>:search_obj</tt> -- default: @#{params_scope}, this is your search object, everything revolves around this. It will try to infer the name from your params_scope. If your params_scope is :search it will try to get @search, etc. If it can not be inferred by this, you need to pass the object itself.
         # * <tt>:params</tt> -- default: nil, Additional params to add to the url, must be a hash
-        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get include. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
+        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get included. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
         # * <tt>:search_params</tt> -- default: nil, Additional search params to add to the url, must be a hash. Adds the options into the :params_scope.
         # * <tt>:exclude_search_params</tt> -- default: nil, Same as :exclude_params but for the :search_params.
         def priority_order_by_link(priority_order_by, priority_order_as, options = {})
@@ -181,14 +181,13 @@ module Searchgasm
         # As you can see above, passing nil means "show all" and the text will automatically revert to "show all"
         #
         # === Options
-        # * <tt>:text</tt> -- default: column_name.to_s.humanize, text for the link
         # * <tt>:html</tt> -- html arrtributes for the <a> tag.
         #
         # === Advanced Options
-        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base leve in params such as params[:page], params[:per_page], etc, then set this to nil.
+        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base level in params such as params[:page], params[:per_page], etc, then set this to nil.
         # * <tt>:search_obj</tt> -- default: @#{params_scope}, this is your search object, everything revolves around this. It will try to infer the name from your params_scope. If your params_scope is :search it will try to get @search, etc. If it can not be inferred by this, you need to pass the object itself.
         # * <tt>:params</tt> -- default: nil, Additional params to add to the url, must be a hash
-        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get include. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
+        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get included. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
         # * <tt>:search_params</tt> -- default: nil, Additional search params to add to the url, must be a hash. Adds the options into the :params_scope.
         # * <tt>:exclude_search_params</tt> -- default: nil, Same as :exclude_params but for the :search_params.
         def per_page_link(per_page, options = {})
@@ -217,10 +216,10 @@ module Searchgasm
         # * <tt>:html</tt> -- html arrtributes for the <a> tag.
         #
         # === Advanced Options
-        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base leve in params such as params[:page], params[:per_page], etc, then set this to nil.
+        # * <tt>:params_scope</tt> -- default: :search, this is the scope in which your search params will be preserved (params[:search]). If you don't want a scope and want your options to be at base level in params such as params[:page], params[:per_page], etc, then set this to nil.
         # * <tt>:search_obj</tt> -- default: @#{params_scope}, this is your search object, everything revolves around this. It will try to infer the name from your params_scope. If your params_scope is :search it will try to get @search, etc. If it can not be inferred by this, you need to pass the object itself.
         # * <tt>:params</tt> -- default: nil, Additional params to add to the url, must be a hash
-        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get include. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
+        # * <tt>:exclude_params</tt> -- default: nil, params you want to exclude. This is nifty because it does a "deep delete". So you can pass {:param1 => {:param2 => :param3}} and it will make sure param3 does not get included. param1 and param2 will not be touched. This also accepts an array or just a symbol or string.
         # * <tt>:search_params</tt> -- default: nil, Additional search params to add to the url, must be a hash. Adds the options into the :params_scope.
         # * <tt>:exclude_search_params</tt> -- default: nil, Same as :exclude_params but for the :search_params.
         def page_link(page, options = {})
@@ -238,29 +237,32 @@ module Searchgasm
         
         private
           def add_order_by_link_defaults!(order_by, options = {})
-            add_searchgasm_control_defaults!(:order_by, options)
+            add_searchgasm_control_defaults!(options)
+            searchgasm_add_class!(options[:html], Config.helpers.order_by_link_class_name)
             ordering_by_this = searchgasm_ordering_by?(order_by, options)
             searchgasm_add_class!(options[:html], "ordering") if ordering_by_this
             options[:text] ||= determine_order_by_text(order_by)
-            options[:asc_indicator] ||= Config.asc_indicator
-            options[:desc_indicator] ||= Config.desc_indicator
+            options[:asc_indicator] ||= Config.helpers.order_by_link_asc_indicator
+            options[:desc_indicator] ||= Config.helpers.order_by_link_desc_indicator
             options[:text] += options[:search_obj].desc? ? options[:desc_indicator] : options[:asc_indicator] if ordering_by_this
             options[:url] = searchgasm_params(options.merge(:search_params => {:order_by => order_by}))
             options
           end
           
           def add_order_as_link_defaults!(order_as, options = {})
-            add_searchgasm_control_defaults!(:order_as, options)
+            add_searchgasm_control_defaults!(options)
+            searchgasm_add_class!(options[:html], Config.helpers.order_as_link_class_name)
             options[:text] ||= order_as.to_s
             options[:url] = searchgasm_params(options.merge(:search_params => {:order_as => order_as}))
             options
           end
           
           def add_priority_order_by_link_defaults!(priority_order_by, priority_order_as, options = {})
-            add_searchgasm_control_defaults!(:priority_order_by, options)
+            add_searchgasm_control_defaults!(options)
+            searchgasm_add_class!(options[:html], Config.helpers.priority_order_by_link_class_name)
             options[:column_name] ||= determine_order_by_text(priority_order_by).downcase 
-            options[:activate_text] ||= "Show #{options[:column_name]} first"
-            options[:deactivate_text] ||= "Don't show #{options[:column_name]} first"
+            options[:activate_text] ||= Config.helpers.priority_order_by_link_activate_text % options[:column_name]
+            options[:deactivate_text] ||= Config.helpers.priority_order_by_link_deactivate_text % options[:column_name]
             active = deep_stringify(options[:search_obj].priority_order_by) == deep_stringify(priority_order_by) && options[:search_obj].priority_order_as == priority_order_as
             options[:text] ||= active ? options[:deactivate_text] : options[:activate_text]
             if active
@@ -273,14 +275,16 @@ module Searchgasm
           end
           
           def add_per_page_link_defaults!(per_page, options = {})
-            add_searchgasm_control_defaults!(:per_page, options)
-            options[:text] ||= per_page.blank? ? "Show all" : "#{per_page} per page"
+            add_searchgasm_control_defaults!(options)
+            searchgasm_add_class!(options[:html], Config.helpers.per_page_link_class_name)
+            options[:text] ||= per_page.to_s
             options[:url] = searchgasm_params(options.merge(:search_params => {:per_page => per_page}))
             options
           end
           
           def add_page_link_defaults!(page, options = {})
-            add_searchgasm_control_defaults!(:page, options)
+            add_searchgasm_control_defaults!(options)
+            searchgasm_add_class!(options[:html], Config.helpers.page_link_class_name)
             options[:text] ||= page.to_s
             options[:url] = searchgasm_params(options.merge(:search_params => {:page => page}))
             options

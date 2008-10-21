@@ -21,6 +21,8 @@ require "searchgasm/shared/virtual_classes"
 
 # Base classes
 require "searchgasm/version"
+require "searchgasm/config/helpers"
+require "searchgasm/config/search"
 require "searchgasm/config"
 
 # ActiveRecord
@@ -42,12 +44,12 @@ require "searchgasm/conditions/base"
 # Condition
 require "searchgasm/condition/base"
 require "searchgasm/condition/tree"
-SEARCHGASM_CONDITIONS = [:begins_with, :blank, :child_of, :descendant_of, :ends_with, :equals, :greater_than, :greater_than_or_equal_to, :inclusive_descendant_of, :like, :nil, :not_begin_with, :not_end_with, :not_equal, :not_have_keywords, :keywords, :less_than, :less_than_or_equal_to, :sibling_of]
+SEARCHGASM_CONDITIONS = [:begins_with, :blank, :child_of, :descendant_of, :ends_with, :equals, :greater_than, :greater_than_or_equal_to, :inclusive_descendant_of, :like, :nil, :not_begin_with, :not_blank, :not_end_with, :not_equal, :not_have_keywords, :not_nil, :keywords, :less_than, :less_than_or_equal_to, :sibling_of]
 SEARCHGASM_CONDITIONS.each { |condition| require "searchgasm/condition/#{condition}" }
 
 # Modifiers
 require "searchgasm/modifiers/base"
-SEARCHGASM_MODIFIERS = [:day_of_month, :day_of_week, :day_of_year, :hour, :microseconds, :milliseconds, :minute, :month, :second, :week, :year]
+SEARCHGASM_MODIFIERS = [:absolute, :acos, :asin, :atan, :ceil, :char_length, :cos, :cot, :day_of_month, :day_of_week, :day_of_year, :degrees, :exp, :floor, :hex, :hour, :log, :log10, :log2, :lower, :ltrim, :md5, :microseconds, :milliseconds, :minute, :month, :octal, :radians, :round, :rtrim, :second, :sign, :sin, :square_root, :tan, :trim, :upper, :week, :year]
 SEARCHGASM_MODIFIERS.each { |modifier| require "searchgasm/modifiers/#{modifier}" }
 
 # Helpers

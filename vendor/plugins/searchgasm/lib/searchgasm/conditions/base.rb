@@ -179,7 +179,7 @@ module Searchgasm
         associations.each do |name, association|
           next if association.conditions.blank?
           association_joins = association.auto_joins
-          j << (association_joins.blank? ? association.relationship_name.to_sym : {association.relationship_name.to_sym => association_joins})
+          j << (association_joins.blank? ? name : {name => association_joins})
         end
         j.blank? ? nil : (j.size == 1 ? j.first : j)
       end
@@ -233,7 +233,7 @@ module Searchgasm
           if object.class < Searchgasm::Conditions::Base
             relationship_conditions = object.conditions
             next if relationship_conditions.blank?
-            conditions_hash[object.relationship_name.to_sym] = relationship_conditions
+            conditions_hash[name] = relationship_conditions
           else
             next if object.value_is_meaningless?
             conditions_hash[name] = object.value
@@ -367,14 +367,14 @@ module Searchgasm
                 column_type = modifier_klasses.first.return_type
               
                 # Build the column sql
-                column_sql = "#{klass.connection.quote_table_name(klass.table_name)}.#{klass.connection.quote_column_name(column_detail[:column].name)}"
+                column_sql = "{table}.{column}"
                 modifier_klasses.each do |modifier_klass|
                   next unless klass.connection.respond_to?(modifier_klass.adapter_method_name)
                   column_sql = klass.connection.send(modifier_klass.adapter_method_name, column_sql)
                 end
               end
             
-              add_condition!(condition_klass, method_name, column_detail[:column], column_type, column_sql)
+              add_condition!(condition_klass, method_name, :column => column_detail[:column], :column_type => column_type, :column_sql_format => column_sql)
             
               ([column_detail[:column].name] + column_detail[:aliases]).each do |column_name|
                 condition_klass.condition_names_for_column.each do |condition_name|
@@ -393,13 +393,15 @@ module Searchgasm
           false
         end
         
-        def add_condition!(condition, name, column = nil, column_type = nil, column_sql = nil)
+        def add_condition!(condition, name, options = {})
           self.class.condition_names << name
+          options[:column] = options[:column].name if options[:column].class < ::ActiveRecord::ConnectionAdapters::Column
           
           self.class.class_eval <<-"end_eval", __FILE__, __LINE__
             def #{name}_object
               if objects[:#{name}].nil?
-                objects[:#{name}] = #{condition.name}.new(klass, #{column.blank? ? "nil" : "klass.columns_hash['#{column.name}']"}, #{column_type.blank? ? "nil" : "\"#{column_type}\""}, #{column_sql.blank? ? "nil" : "\"#{column_sql.gsub('"', '\"')}\""})
+                options = {}
+                objects[:#{name}] = #{condition.name}.new(klass, #{options.inspect})
               end
               objects[:#{name}]
             end
@@ -465,7 +467,7 @@ module Searchgasm
         end
         
         def reset_objects!
-          objects.each { |name, object| object.class < ::Searchgasm::Conditions::Base ? eval("@#{object.relationship_name} = nil") : eval("@#{name} = nil") }
+          objects.each { |name, object| eval("@#{name} = nil") }
           objects.clear
         end
         

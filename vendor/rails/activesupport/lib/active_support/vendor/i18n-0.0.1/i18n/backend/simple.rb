@@ -1,10 +1,9 @@
-require 'strscan'
+require 'yaml'
 
 module I18n
   module Backend
     class Simple
       INTERPOLATION_RESERVED_KEYS = %w(scope default)
-      DEPRECATED_INTERPOLATORS = { '%d' => '{{count}}', '%s' => '{{value}}' }
       MATCH = /(\\\\)?\{\{([^\}]+)\}\}/
 
       # Accepts a list of paths to translation files. Loads translations from 
@@ -31,7 +30,13 @@ module I18n
         options.delete(:default)
         values = options.reject{|name, value| reserved.include? name }
 
-        entry = lookup(locale, key, scope) || default(locale, default, options) || raise(I18n::MissingTranslationData.new(locale, key, options))
+        entry = lookup(locale, key, scope)
+        if entry.nil?
+          entry = default(locale, default, options)
+          if entry.nil?
+            raise(I18n::MissingTranslationData.new(locale, key, options))
+          end
+        end
         entry = pluralize locale, entry, count
         entry = interpolate locale, entry, values
         entry
@@ -60,7 +65,16 @@ module I18n
         object.strftime(format)
       end
       
+      def initialized?
+        @initialized ||= false
+      end
+
       protected
+
+        def init_translations
+          load_translations(*I18n.load_path)
+          @initialized = true
+        end
         
         def translations
           @translations ||= {}
@@ -73,8 +87,15 @@ module I18n
         # <tt>%w(currency format)</tt>.
         def lookup(locale, key, scope = [])
           return unless key
+          init_translations unless initialized?
           keys = I18n.send :normalize_translation_keys, locale, key, scope
-          keys.inject(translations){|result, k| result[k.to_sym] or return nil }
+          keys.inject(translations) do |result, k|
+            if (x = result[k.to_sym]).nil?
+              return nil
+            else
+              x
+            end
+          end
         end
       
         # Evaluates a default translation. 
@@ -95,7 +116,7 @@ module I18n
         rescue MissingTranslationData
           nil
         end
-      
+
         # Picks a translation from an array according to English pluralization
         # rules. It will pick the first translation if count is not equal to 1
         # and the second translation if it is equal to 1. Other backends can
@@ -119,12 +140,6 @@ module I18n
         # interpolation).
         def interpolate(locale, string, values = {})
           return string unless string.is_a?(String)
-
-          string = string.gsub(/%d|%s/) do |s|
-            instead = DEPRECATED_INTERPOLATORS[s]
-            ActiveSupport::Deprecation.warn "using #{s} in messages is deprecated; use #{instead} instead."
-            instead
-          end
 
           if string.respond_to?(:force_encoding)
             original_encoding = string.encoding

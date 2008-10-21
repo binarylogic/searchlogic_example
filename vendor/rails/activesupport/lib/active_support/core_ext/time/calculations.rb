@@ -98,6 +98,16 @@ module ActiveSupport #:nodoc:
         # <tt>:months</tt>, <tt>:weeks</tt>, <tt>:days</tt>, <tt>:hours</tt>,
         # <tt>:minutes</tt>, <tt>:seconds</tt>.
         def advance(options)
+          unless options[:weeks].nil?
+            options[:weeks], partial_weeks = options[:weeks].divmod(1)
+            options[:days] = (options[:days] || 0) + 7 * partial_weeks
+          end
+          
+          unless options[:days].nil?
+            options[:days], partial_days = options[:days].divmod(1)
+            options[:hours] = (options[:hours] || 0) + 24 * partial_days
+          end
+          
           d = to_date.advance(options)
           time_advanced_by_date = change(:year => d.year, :month => d.month, :day => d.day)
           seconds_to_advance = (options[:seconds] || 0) + (options[:minutes] || 0) * 60 + (options[:hours] || 0) * 3600
@@ -223,7 +233,7 @@ module ActiveSupport #:nodoc:
 
         # Returns a new Time representing the end of the quarter (last day of march, june, september, december, 23:59:59)
         def end_of_quarter
-          change(:month => [3, 6, 9, 12].detect { |m| m >= self.month }).end_of_month
+          beginning_of_month.change(:month => [3, 6, 9, 12].detect { |m| m >= self.month }).end_of_month
         end
         alias :at_end_of_quarter :end_of_quarter
 

@@ -30,7 +30,7 @@ class TestSearchBase < Test::Unit::TestCase
   def test_setting_first_level_options
     search = Account.new_search!(:include => :users, :joins => :users, :offset => 5, :limit => 20, :order => "name ASC", :select => "name", :readonly => true, :group => "name", :from => "accounts", :lock => true)
     assert_equal :users, search.include
-    assert_equal " LEFT OUTER JOIN \"users\" ON users.account_id = accounts.id ", search.joins
+    assert_equal :users, search.joins
     assert_equal 5, search.offset
     assert_equal 20, search.limit
     assert_equal "name ASC", search.order
@@ -99,20 +99,20 @@ class TestSearchBase < Test::Unit::TestCase
     assert_equal search.lock, true
   end
 
-  def test_auto_joins
+  def test_joins
     search = Account.new_search
-    assert_equal nil, search.auto_joins
+    assert_equal nil, search.joins
     search.conditions.name_contains = "Binary"
-    assert_equal nil, search.auto_joins
+    assert_equal nil, search.joins
     search.conditions.users.first_name_contains = "Ben"
-    assert_equal(:users, search.auto_joins)
+    assert_equal(:users, search.joins)
     search.conditions.users.orders.id_gt = 2
-    assert_equal({:users => :orders}, search.auto_joins)
+    assert_equal({:users => :orders}, search.joins)
     search.conditions.users.reset_orders!
-    assert_equal(:users, search.auto_joins)
+    assert_equal(:users, search.joins)
     search.conditions.users.orders.id_gt = 2
     search.conditions.reset_users!
-    assert_equal nil, search.auto_joins
+    assert_equal nil, search.joins
   end
 
   def test_limit
@@ -141,7 +141,7 @@ class TestSearchBase < Test::Unit::TestCase
     search.conditions.users.id_greater_than = 2
     search.page = 3
     search.readonly = true
-    assert_equal({:joins => " LEFT OUTER JOIN \"users\" ON users.account_id = accounts.id ", :offset => 4, :readonly => true, :conditions => ["(\"accounts\".\"name\" LIKE ?) AND (\"users\".\"id\" > ?)", "%Binary%", 2], :limit => 2 }, search.sanitize)
+    assert_equal({:joins => :users, :offset => 4, :select => "DISTINCT \"accounts\".*", :readonly => true, :conditions => ["(\"accounts\".\"name\" LIKE ?) AND (\"users\".\"id\" > ?)", "%Binary%", 2], :limit => 2 }, search.sanitize)
   end
 
   def test_scope
@@ -185,6 +185,11 @@ class TestSearchBase < Test::Unit::TestCase
     search = Account.new_search
     search.select = "id, name"
     assert_equal Account.all, search.all
+    
+    search = Account.scope1.new_search!(:conditions => {:users => {:first_name_starts_with => "Ben"}})
+    assert_equal [Account.find(1)], search.all
+    search2 = search.dup
+    assert_equal [Account.find(1)], search2.all
   end
 
   def test_calculations
@@ -211,22 +216,12 @@ class TestSearchBase < Test::Unit::TestCase
     assert_equal 1, search.count
   end
   
-  def test_method_creation_in_scope
-    # test ot make sure methods are not created across the board for all models
-  end
-  
-=begin
-  # AR desont handle this problem either
-  def test_specifying_includes
-    search = Account.new_search
-    search.include = :users
-    search.conditions.users.first_name_like = "Ben"
-    assert_nothing_raised { search.all }
-  end
-=end
-  
   def test_inspect
     search = Account.new_search
     assert_nothing_raised { search.inspect }
+  end
+  
+  def test_sti
+    
   end
 end

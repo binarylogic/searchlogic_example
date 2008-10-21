@@ -1,10 +1,10 @@
 require "test/unit"
 require "rubygems"
 require "ruby-debug"
-require "activerecord"
-require File.dirname(__FILE__) + '/libs/acts_as_tree'
-require File.dirname(__FILE__) + '/libs/ordered_hash'
-require File.dirname(__FILE__) + '/libs/rexml_fix'
+require "active_record"
+require File.dirname(__FILE__) + '/../test_libs/acts_as_tree'
+require File.dirname(__FILE__) + '/../test_libs/ordered_hash'
+require File.dirname(__FILE__) + '/../test_libs/rexml_fix'
 require File.dirname(__FILE__) + '/../lib/searchgasm'
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
@@ -13,6 +13,8 @@ class Account < ActiveRecord::Base
   has_one :admin, :class_name => "User", :conditions => {:first_name => "Ben"}
   has_many :users, :dependent => :destroy
   has_many :orders, :through => :users
+  
+  named_scope :scope1, :conditions => {:users => {:first_name_contains => "Ben"}}
 end
 
 class UserGroup < ActiveRecord::Base
@@ -23,11 +25,23 @@ class User < ActiveRecord::Base
   acts_as_tree
   belongs_to :account
   has_many :orders, :dependent => :destroy
+  has_many :cats, :dependent => :destroy
+  has_many :dogs, :dependent => :destroy
   has_and_belongs_to_many :user_groups
 end
 
 class Order < ActiveRecord::Base
   belongs_to :user
+end
+
+# STI
+class Animal < ActiveRecord::Base
+end
+
+class Dog < Animal
+end
+
+class Cat < Animal
 end
 
 class Test::Unit::TestCase
@@ -70,11 +84,18 @@ class Test::Unit::TestCase
         t.text      :description
         t.binary    :receipt
       end
+      
+      create_table :animals do |t|
+        t.datetime  :created_at      
+        t.datetime  :updated_at
+        t.string   :type
+        t.text     :description
+      end
     end
   end
   
   def load_fixtures
-    fixtures = [:accounts, :orders, :users, :user_groups]
+    fixtures = [:accounts, :orders, :users, :user_groups, :dogs, :cats]
     fixtures.each do |fixture|
       records = YAML.load(File.read(File.dirname(__FILE__) + "/fixtures/#{fixture.to_s}.yml"))
       records.each do |name, attributes|

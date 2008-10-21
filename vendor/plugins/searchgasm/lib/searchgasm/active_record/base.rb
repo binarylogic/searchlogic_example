@@ -108,6 +108,7 @@ module Searchgasm
           return options unless Searchgasm::Search::Base.needed?(self, options)
           search = Searchgasm::Search::Base.create_virtual_class(self).new # call explicitly to avoid merging the scopes into the search
           search.acting_as_filter = true
+          search.scope = scope(:find)
           conditions = options.delete(:conditions) || options.delete("conditions") || {}
           if conditions
             case conditions
@@ -120,7 +121,7 @@ module Searchgasm
           search.options = options
           search.sanitize(searching)
         end
-      
+        
         def searchgasm_search(options = {})
           scope = {}
           current_scope = scope(:find) && scope(:find).deep_dup
@@ -164,6 +165,54 @@ module ActiveRecord #:nodoc: all
       def valid_calculations_options
         Calculations::CALCULATIONS_OPTIONS
       end
+      
+      private
+        # This is copied over from 2 different versions of ActiveRecord. I have to do this in order to preserve the "auto joins"
+        # as symbols. Keeping them as symbols allows ActiveRecord to merge them properly. The problem is when they conflict with includes.
+        # Includes add joins also, and they add them before joins do. So if they already added them skip them. Now you can do queries like:
+        #
+        # User.all(:joins => {:orders => :line_items}, :include => :orders)
+        #
+        # Where as before, the only way to get the above query to work would be to include line_items also, which is not neccessarily what you want.
+        def add_joins!(sql, options_or_joins, scope = :auto) # :nodoc:
+          code_type = (respond_to?(:array_of_strings?, true) && :array_of_strings) || (respond_to?(:merge_joins, true) && :merge_joins)
+
+          case code_type
+          when :array_of_strings, :merge_joins
+            joins = options_or_joins
+            scope = scope(:find) if :auto == scope
+            merged_joins = scope && scope[:joins] && joins ? merge_joins(scope[:joins], joins) : (joins || scope && scope[:joins])
+            case merged_joins
+            when Symbol, Hash, Array
+              if code_type == :array_of_strings && array_of_strings?(merged_joins)
+                merged_joins.each { |merged_join| sql << " #{merged_join} " unless sql.include?(merged_join) }
+              else
+                join_dependency = ActiveRecord::Associations::ClassMethods::InnerJoinDependency.new(self, merged_joins, nil)
+                join_dependency.join_associations.each do |assoc|
+                  join_sql = assoc.association_join
+                  sql << " #{join_sql} " unless sql.include?(join_sql)
+                end
+              end
+            when String
+              sql << " #{merged_joins} " if merged_joins && !sql.include?(merged_joins)
+            end
+          else
+            options = options_or_joins
+            scope = scope(:find) if :auto == scope
+            [(scope && scope[:joins]), options[:joins]].each do |join|
+              case join
+              when Symbol, Hash, Array
+                join_dependency = ActiveRecord::Associations::ClassMethods::InnerJoinDependency.new(self, join, nil)
+                join_dependency.join_associations.each do |assoc|
+                  join_sql = assoc.association_join
+                  sql << " #{join_sql} " unless sql.include?(join_sql)
+                end
+              else
+                sql << " #{join} " if join && !sql.include?(join)
+              end
+            end
+          end
+        end
     end
   end
 end

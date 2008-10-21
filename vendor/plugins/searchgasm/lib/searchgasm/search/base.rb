@@ -22,7 +22,7 @@ module Searchgasm #:nodoc:
       OPTIONS = SPECIAL_FIND_OPTIONS + AR_OPTIONS # the order is very important, these options get set in this order
       
       attr_accessor *AR_OPTIONS
-      attr_reader :auto_joins
+      attr_writer :scope
       
       class << self
         # Used in the ActiveRecord methods to determine if Searchgasm should get involved or not.
@@ -43,7 +43,7 @@ module Searchgasm #:nodoc:
       end
       
       # Flag to determine if searchgasm is acting as a filter for the ActiveRecord search methods.
-      # The purpose of this is to determine if Config.per_page should be implemented.
+      # By filter it means that searchgasm is being used on the default ActiveRecord search methods, like all, count, find(:all), first, etc.
       def acting_as_filter=(value)
         @acting_as_filter = value
       end
@@ -56,8 +56,9 @@ module Searchgasm #:nodoc:
       # Specific implementation of cloning
       def clone
         options = {}
-        (OPTIONS - [:conditions]).each { |option| options[option] = send(option) }
+        (AR_OPTIONS - [:conditions]).each { |option| options[option] = instance_variable_get("@#{option}") }
         options[:conditions] = conditions.conditions
+        SPECIAL_FIND_OPTIONS.each { |option| options[option] = send(option) }
         obj = self.class.new(options)
         obj.protect = protected?
         obj.scope = scope
@@ -79,27 +80,10 @@ module Searchgasm #:nodoc:
         "#<#{klass}Search #{current_find_options.inspect}>"
       end
       
-      # Searchgasm requires that all joins be left outer joins for conditions and ordering to work properly
+      # Merges all joins together, including the scopes joins for
       def joins
-        joins_sql = ""
-        all_joins = auto_joins
-        
-        case @joins
-        when String
-          joins_sql += @joins
-        else
-          all_joins = merge_joins(@joins, all_joins)
-        end
-        
-        return if joins_sql.blank? && all_joins.blank?
-        
-        unless all_joins.blank?
-          join_dependency = ::ActiveRecord::Associations::ClassMethods::JoinDependency.new(klass, all_joins, nil)
-          joins_sql += " " unless joins_sql.blank?
-          joins_sql += join_dependency.join_associations.collect { |assoc| assoc.association_join }.join
-        end
-        
-        joins_sql
+        all_joins = (safe_to_array(conditions.auto_joins) + safe_to_array(order_by_auto_joins) + safe_to_array(priority_order_by_auto_joins) + safe_to_array(@joins)).uniq
+        all_joins.size <= 1 ? all_joins.first : all_joins
       end
       
       def limit=(value)
@@ -108,7 +92,7 @@ module Searchgasm #:nodoc:
       end
       
       def limit
-        @limit ||= Config.per_page if !acting_as_filter? && !@set_limit
+        @limit ||= Config.search.per_page if !acting_as_filter? && !@set_limit
         @limit
       end
       
@@ -123,7 +107,7 @@ module Searchgasm #:nodoc:
       end
       
       # Sanitizes everything down into options ActiveRecord::Base.find can understand
-      def sanitize(searching = true)
+      def sanitize(searching = true)  
         find_options = {}
         
         (searching ? AR_FIND_OPTIONS : AR_CALCULATIONS_OPTIONS).each do |find_option|
@@ -135,9 +119,30 @@ module Searchgasm #:nodoc:
         find_options
       end
       
+      def select
+        @select ||= "DISTINCT #{klass.connection.quote_table_name(klass.table_name)}.*" if !joins.blank? && Config.search.remove_duplicates?
+        @select
+      end
+      
       def scope
         @scope ||= {}
       end
+      
+      private
+        def safe_to_array(o)
+          case o
+          when NilClass
+            []
+          when Array
+            o
+          else
+            [o]
+          end
+        end
+        
+        def array_of_strings?(o)
+          o.is_a?(Array) && o.all?{|obj| obj.is_a?(String)}
+        end
     end
   end
 end

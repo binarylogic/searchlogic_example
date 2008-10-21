@@ -211,7 +211,8 @@ class FormTagHelperTest < ActionView::TestCase
   def test_boolean_optios
     assert_dom_equal %(<input checked="checked" disabled="disabled" id="admin" name="admin" readonly="readonly" type="checkbox" value="1" />), check_box_tag("admin", 1, true, 'disabled' => true, :readonly => "yes")
     assert_dom_equal %(<input checked="checked" id="admin" name="admin" type="checkbox" value="1" />), check_box_tag("admin", 1, true, :disabled => false, :readonly => nil)
-    assert_dom_equal %(<select id="people" multiple="multiple" name="people"><option>david</option></select>), select_tag("people", "<option>david</option>", :multiple => true)
+    assert_dom_equal %(<select id="people" multiple="multiple" name="people[]"><option>david</option></select>), select_tag("people", "<option>david</option>", :multiple => true)
+    assert_dom_equal %(<select id="people[]" multiple="multiple" name="people[]"><option>david</option></select>), select_tag("people[]", "<option>david</option>", :multiple => true)
     assert_dom_equal %(<select id="people" name="people"><option>david</option></select>), select_tag("people", "<option>david</option>", :multiple => nil)
   end
 
@@ -270,6 +271,12 @@ class FormTagHelperTest < ActionView::TestCase
     field_set_tag('') { concat "Hello world!" }
 
     expected = %(<fieldset>Hello world!</fieldset>)
+    assert_dom_equal expected, output_buffer
+
+    self.output_buffer = ''
+    field_set_tag('', :class => 'format') { concat "Hello world!" }
+
+    expected = %(<fieldset class="format">Hello world!</fieldset>)
     assert_dom_equal expected, output_buffer
   end
 
