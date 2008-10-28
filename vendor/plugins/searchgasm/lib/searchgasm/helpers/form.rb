@@ -13,16 +13,16 @@ module Searchgasm
     #   form_for([:admin, @search]) # is equivalent to form_for(:search, @search, :url => admin_addresses_path)
     #   form_for(:search, @search, :url => whatever_path)
     #
-    # The goal was to mimic ActiveRecord. You can also pass a Searchgasm::Conditions::Base object as well and it will function the same way.
+    # The goal was to mimic how ActiveRecord objects are treated. You can also pass a Searchgasm::Conditions::Base object as well and it will function the same way.
     #
     # === Automatic hidden fields generation
     #
-    # If you pass a Searchgasm::Search::Base object it automatically adds the :order_by, :order_as, and :per_page hidden fields. This is done so that when someone
-    # creates a new search, their options are remembered. It keeps the search consisten and is much more user friendly. If you want to override this you can pass the
+    # If you pass a Searchgasm::Search::Base object it automatically adds the :order_by, :order_as, :priority_order_by, :priority_order_as, and :per_page hidden fields. This is done so that when someone
+    # creates a new search, their options are remembered. It keeps the search consistent and is much more user friendly. If you want to override this you can pass the
     # following options or you can set this up in your configuration, see Searchgasm::Config for more details.
     #
-    # Lastly some light javascript is added to the "onsubmit" action. You will notice the order_by, per_page, and page helpers also add in a single hidden tag in the page. The form
-    # finds these elements, gets their values and updates its hidden fields so that the correct values will be submitted during the search. The end result is having the "ordering" and "per page" options remembered.
+    # Lastly some light javascript is added to the "onsubmit" action. You will notice that the control type helpers add in hidden fields in the page, as a way to declare its "state". The form
+    # finds these elements, gets their values and updates its hidden fields so that the correct values will be submitted during the search. The end result is having these search options remembered.
     #
     # === Options
     #
@@ -90,12 +90,13 @@ module Searchgasm
               if !search_options[:hidden_fields].blank?
                 options[:html][:onsubmit] ||= ""
                 options[:html][:onsubmit] += ";"
-              
-                javascript = "if(typeof(Prototype) != 'undefined') {"
-                search_options[:hidden_fields].each { |field| javascript += "field = $('#{name}_#{field}'); if(field) { $('#{name}_#{field}_hidden').value = field.value; }" }
-                javascript += "} else if(typeof(jQuery) != 'undefined') {"
-                search_options[:hidden_fields].each { |field| javascript += "field = $('##{name}_#{field}'); if(field) { $('##{name}_#{field}_hidden').val(field.val()); }" }
-                javascript += "}"
+                
+                javascript = ""
+                javascript += "if(typeof(Prototype) != 'undefined') {" if Config.helpers.javascript_library.blank?
+                search_options[:hidden_fields].each { |field| javascript += "field = $('#{name}_#{field}'); if(field) { $('#{name}_#{field}_hidden').value = field.value; }" } if Config.helpers.javascript_library.blank? || Config.helpers.javascript_library == :prototype
+                javascript += "} else if(typeof(jQuery) != 'undefined') {" if Config.helpers.javascript_library.blank?
+                search_options[:hidden_fields].each { |field| javascript += "field = $('##{name}_#{field}'); if(field) { $('##{name}_#{field}_hidden').val(field.val()); }" } if Config.helpers.javascript_library.blank? || Config.helpers.javascript_library == :jquery
+                javascript += "}" if Config.helpers.javascript_library.blank?
               
                 options[:html][:onsubmit] += javascript
               end
@@ -127,7 +128,7 @@ module Searchgasm
               # For edge rails and older version compatibility, passing a binding to concat was deprecated
               begin
                 concat(html)
-              rescue ArgumentError
+              rescue ArgumentError, NameError
                 concat(html, block.binding)
               end
             end

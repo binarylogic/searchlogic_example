@@ -3,76 +3,80 @@ Good ol' regular http requests.
 <br /><br />
 
 <% form_for [:non_ajax, @search] do |f| %>
-    <fieldset>
-        <legend>Search Users</legend>
-        
-        <% f.fields_for @search.conditions do |users| %>
-            Match ANY or ALL of the conditions:<br />
-            <%= users.select :any, [["All", false], ["Any", true]] %><br />
-            <br />
-            
-            First name keywords:<br />
-            <%= users.text_field :first_name_keywords %><br />
-            <br />
-            
-            First name sounds like: (try &quot;bin&quot;, this is a custom condition, checkout config/initializers/searchgasm.rb)<br />
-            <%= users.text_field :first_name_sounds_like %><br />
-            <br />
-            
-            Last name keywords:<br />
-            <%= users.text_field :last_name_keywords %><br />
-            <br />
-            
-            Email ends with:<br />
-            <%= users.text_field :email_ends_with %><br />
-            <br />
+  <fieldset>
+    <legend>Search Users</legend>
+  
+    <% f.fields_for @search.conditions do |users| %>
+      <%= users.label :any, "Match ANY or ALL of the conditions" %><br />
+      <%= users.select :any, [["All", false], ["Any", true]] %><br />
+      <br />
+      
+      <%= users.label :first_name_keywords %><br />
+      <%= users.text_field :first_name_keywords %><br />
+      <br />
+      
+      <%= users.label :first_name_sounds_like, "First name sounds like: (try &quot;bin&quot;, this is a custom condition, checkout config/initializers/searchgasm.rb)" %><br />
+      <%= users.text_field :first_name_sounds_like %><br />
+      <br />
+    
+      <%= users.label :last_name_keywords %><br />
+      <%= users.text_field :last_name_keywords %><br />
+      <br />
+    
+      <%= users.label :email_ends_with %><br />
+      <%= users.text_field :email_ends_with %><br />
+      <br />
 
-            <% users.fields_for users.object.orders do |orders| %>
-                Has orders with a total greater than:<br />
-                $<%= orders.text_field :total_gt %><br />
-                <br />
-            <% end %>
-            
-            <% users.fields_for users.object.user_group do |user_group| %>
-                Belongs to user group with name that starts with:<br />
-                <%= user_group.text_field :name_starts_with %><br />
-                <br />
-            <% end %>
-            <%= f.submit "Search" %>
-        <% end %>
-    </fieldset>
+      <% users.fields_for users.object.orders do |orders| %>
+        <%= orders.label :total_gt, "Has orders with a total greater than" %><br />
+        $<%= orders.text_field :total_gt %><br />
+        <br />
+      <% end %>
+    
+      <% users.fields_for users.object.user_group do |user_group| %>
+        <%= user_group.label :name_starts_with, "Belongs to user group with name that starts with" %><br />
+        <%= user_group.text_field :name_starts_with %><br />
+        <br />
+      <% end %>
+    
+      <%= users.check_box :user_group_id_is_not_null, {}, "1", "" %> <%= users.label :user_group_id_is_not_null %><br />
+      <br />
+    
+      <%= f.submit "Search" %>
+    <% end %>
+  </fieldset>
 <% end %>
 
 <% if @users_count > 0 %>
-    <%= @users_count %> users found
-    <table border="1" cellpadding="5">
-        <tr>
-            <th><%= order_by_link :id %></th>
-            <th><%= order_by_link :user_group => :name %></th>
-            <th><%= order_by_link :first_name %></th>
-            <th><%= order_by_link :last_name %></th>
-            <th><%= order_by_link [:email, :first_name] %></th>
-        </tr>
-        <% @users.each do |user| %>
-            <tr>
-                <td><%= user.id %></td>
-                <td><%= user.user_group ? user.user_group.name : "-" %></td>
-                <td><%= user.first_name %></td>
-                <td><%= user.last_name %></td>
-                <td><%= user.email %></td>
-            </tr>
-        <% end %>
-    </table>
-    
-    <br />
-    <br />
-    
-    Per page: <%= per_page_select %>
-    <br />
-    <br />
-    <% if @search.page_count > 1 %>
-        <div class="pages"><%= page_links :spread => 1 %></div>
+  <%= @users_count %> users found
+  <table border="1" cellpadding="5">
+    <tr>
+      <th><%= order_by_link :id %></th>
+      <th><%= order_by_link :user_group => :name %></th>
+      <th><%= order_by_link :first_name %></th>
+      <th><%= order_by_link :last_name %></th>
+      <th><%= order_by_link [:email, :first_name] %></th>
+    </tr>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.id %></td>
+        <td><%= user.user_group ? user.user_group.name : "-" %></td>
+        <td><%= user.first_name %></td>
+        <td><%= user.last_name %></td>
+        <td><%= user.email %></td>
+      </tr>
     <% end %>
+  </table>
+  
+  <br />
+  <br />
+  
+  Per page: <%= per_page_select %>
+  <br />
+  <br />
+  <% if @search.page_count > 1 %>
+    <div class="pages"><%= page_links :spread => 1 %></div>
+  <% end %>
 <% else %>
-    No users were returned
+  No users were returned
 <% end %>
