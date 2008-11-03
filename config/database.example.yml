@@ -3,15 +3,15 @@ login: &login
 
 development:
   adapter: mysql
-  database: searchgasm_development 
+  database: searchlogic_development 
   <<: *login
 
 test:
   adapter: mysql
-  database: searchgasm_test
+  database: searchlogic_test
   <<: *login
 
 production:
   adapter: mysql
-  database: searchgasm_production
+  database: searchlogic_production
   <<: *login

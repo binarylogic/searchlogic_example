@@ -47,7 +47,7 @@ Rails::Initializer.run do |config|
   
   #if RAILS_ENV == "development" # putting this in environments/development.rb doesn't work, not sure why
   #  config.plugin_paths += ["#{RAILS_ROOT}/../../Libs"]
-  #  config.plugins = [:searchgasm]
+  #  config.plugins = [:searchlogic]
   #  require "ruby-debug"
   #end
 
@@ -56,7 +56,7 @@ Rails::Initializer.run do |config|
   # Make sure the secret is at least 30 characters and all random, 
   # no regular words or you'll be exposed to dictionary attacks.
   #config.action_controller.session = {
-  #  :session_key => '_searchgasm_example_session',
+  #  :session_key => '_searchlogic_example_session',
   #  :secret      => '4d7db02f53d3bccd73428357072797fb6b04507ad3ef08f0abc589c2f1a6ee8f10e71bdbbc357f8fd50a7620f4bb433836e18017517a9df9df70c910fa3006c8'
   #}
 

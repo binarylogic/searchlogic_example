@@ -1,19 +1,19 @@
-= Searchgasm Example
+= Searchlogic Example
 
-This is an example of how to use Searchgasm in a rails app. Searchgasm is simple searching, ordering, and pagination all in one plugin.
+This is an example of how to use Searchlogic in a rails app. Searchlogic is simple searching, ordering, and pagination all in one plugin.
 
-This application live: http://searchgasm_example.binarylogic.com
+This application live: http://searchlogic_example.binarylogic.com
 
 Quick tutorial on how to build this application here: http://www.binarylogic.com/2008/9/7/tutorial-pagination-ordering-and-searching-with-searchgasm
 
-Searchgasm: http://github.com/binarylogic/searchgasm
+Searchlogic: http://github.com/binarylogic/searchlogic
 
 === Key files
 
 Here are the files you want to glance at:
 
 1.	All of the controllers and their respective views
-2.	config/initializers/searchgasm.rb
+2.	config/initializers/searchlogic.rb
 
 === Generate Test Data
 
