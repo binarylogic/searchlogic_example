@@ -4,7 +4,7 @@ This is an example of how to use Searchlogic in a rails app. Searchlogic is simp
 
 This application live: http://searchlogic_example.binarylogic.com
 
-Quick tutorial on how to build this application here: http://www.binarylogic.com/2008/9/7/tutorial-pagination-ordering-and-searching-with-searchgasm
+Quick tutorial on how to build this application here: http://www.binarylogic.com/2008/9/7/tutorial-pagination-ordering-and-searching-with-searchlogic
 
 Searchlogic: http://github.com/binarylogic/searchlogic
 
