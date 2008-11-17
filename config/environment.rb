@@ -27,6 +27,7 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem "populator", :version => ">=0.2.4"
   config.gem "faker",     :version => ">=0.3.1"
+  #config.gem "searchlogic"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -45,11 +46,11 @@ Rails::Initializer.run do |config|
   # Run "rake -D time" for a list of tasks for finding time zone names. Uncomment to use default local time.
   config.time_zone = 'UTC'
   
-  #if RAILS_ENV == "development" # putting this in environments/development.rb doesn't work, not sure why
-  #  config.plugin_paths += ["#{RAILS_ROOT}/../../Libs"]
-  #  config.plugins = [:searchlogic]
-  #  require "ruby-debug"
-  #end
+  if RAILS_ENV == "development" # putting this in environments/development.rb doesn't work, not sure why
+    config.plugin_paths += ["#{RAILS_ROOT}/../../Libs"]
+    config.plugins = [:searchlogic]
+    require "ruby-debug"
+  end
 
   # Your secret key for verifying cookie session data integrity.
   # If you change this key, all old sessions will become invalid!
